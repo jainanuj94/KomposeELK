@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-single-node.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kibana
+  name: kibana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: kibana
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f docker-compose-single-node.yml
+        kompose.version: 1.21.0 (992df58d8)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/elk_net: "true"
+        io.kompose.service: kibana
+    spec:
+      containers:
+        - env:
+            - name: ELASTICSEARCH_HOSTS
+              value: '"http://elasticsearch:9200"'
+            - name: XPACK_ACTTIONS_ENABLEACTIONTYPES
+              value: '"[''*'']"'
+            - name: XPACK_ACTTIONS_WHITELISTEDHOSTS
+              value: '"[''*'']"'
+            - name: XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY
+              value: '"c1b5KCGSCoCdziSjyHOkwmmB7c0e1kHz"'
+          image: docker.elastic.co/kibana/kibana:7.8.0
+          imagePullPolicy: ""
+          name: kibana
+          ports:
+            - containerPort: 5601
+          resources: {}
+      restartPolicy: Always
+      serviceAccountName: ""
+      volumes: null
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose-single-node.yml
+    kompose.version: 1.21.0 (992df58d8)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: kibana
+  name: kibana
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "5601"
+      port: 5601
+      targetPort: 5601
+      nodePort: 30561
+  selector:
+    io.kompose.service: kibana
+status:
+  loadBalancer: {}
