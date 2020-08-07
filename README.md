@@ -35,4 +35,8 @@ Kompose is a utility to convert docker-compose to k8s yamls. It is suggested by 
   ```
   PVC (Persistent Volume Claim) needs to be available for elasticsearch deployment so that it can be mounted with the persistent volume. 
   The name-deployment.yaml files contain both the Deployment and Service kind for elasticsearch and kibana
-  
+  - Starting services throught minikube to be exposed outside
+  ```
+  minikube service kibana
+  minikube service elasticsearch
+  ```
