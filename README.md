@@ -17,14 +17,22 @@ Kompose is a utility to convert docker-compose to k8s yamls. It is suggested by 
   - Issues Encountered: 
     - *It does not identify the environment variables and ignored all the environment variables. We need to create configMaps for these env variables manually*
     - *Since environment variables are ignored, they don't end up in the converted yamls. Example: the image name with env variables - only the text would be converted and env variables would be ignored*
-    
+  
+## Additional Changes to kompose yamls
+  - We need to expose the external services so that same can be accessed from outside of k8s. In order to achieve it, in the Service we specify the `type: LoadBalance` and under ports we add `NodePort: portFromAvailablePorts`
+  - Currently in the yamls we have default docker images, we can point to the private docker registry by following [this](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/).
+  - We can additionally create ConfigMaps to handle the environment variables
+  
 ## Starting ELK with Minikube
   - Start minikube
   ```minikube start --vm=true```
   <br/>By default, minikube would start using the docker driver. Exposing the service with docker driver is a bit tricky as it requires to create a tunnel and then expose the same. For simiplicity sake, we would use VM driver. The default vm driver for MAC is hyperkit.
   - Run the following commands <br/>
   ```
-     kubectl apply -f elasticsearch-persistentvolumesclient.yaml
+     kubectl apply -f elasticsearch-persistentvolumesclaim.yaml
      kubectl apply -f elasticsearch-deployment.yaml
      kubectl apply -f kibana-deployment.yaml
   ```
+  PVC (Persistent Volume Claim) needs to be available for elasticsearch deployment so that it can be mounted with the persistent volume. 
+  The name-deployment.yaml files contain both the Deployment and Service kind for elasticsearch and kibana
+  
